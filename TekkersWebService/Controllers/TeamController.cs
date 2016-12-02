@@ -6,6 +6,8 @@ using System.Web.Http.OData;
 using Microsoft.Azure.Mobile.Server;
 using TekkersService.DataObjects;
 using TekkersWebService.Models;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace TekkersWebService.Controllers
 {
@@ -56,6 +58,14 @@ namespace TekkersWebService.Controllers
             conn.Teams.Remove(team);
             await conn.SaveChangesAsync();
             return;
+        }
+
+        [Route("tables/Team/GetAllTeams")]
+        public List<Team> GetAllTeams()
+        {
+            var conn = new TekkersContext();
+            List<Team> allteams = conn.Teams.ToList();
+            return allteams;
         }
     }
 }

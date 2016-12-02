@@ -6,6 +6,7 @@ using System.Web.Http.OData;
 using Microsoft.Azure.Mobile.Server;
 using TekkersWebService.Models;
 using TekkersWebService.DataObjects;
+using System;
 
 namespace TekkersWebService.Controllers
 {
@@ -59,5 +60,35 @@ namespace TekkersWebService.Controllers
         {
             return DeleteAsync(id);
         }
+
+        //GET tables/Player/GetPlayersOnTeamAsync/48D68C86-6EA6-4C25-AA33-223FC9A27959
+        [Route("tables/Player/EnterAssessmentScore/{id}/{score}")]
+        public async Task EnterAssessmentScore(string id, int score)
+        {
+            var conn = new TekkersContext();
+            var assessment = conn.Assessments.Single(ass => ass.Id == id);
+            assessment.AssessmentScore = score;
+            try
+            {
+                await conn.SaveChangesAsync();
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                Exception raise = dbEx;
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        string message = String.Format("{0}:{1}",
+                            validationErrors.Entry.Entity.ToString(),
+                            validationError.ErrorMessage);
+                        raise = new InvalidOperationException(message, raise);
+                    }
+                }
+                throw raise;
+            }
+            return;
+        }
     }
 }
+

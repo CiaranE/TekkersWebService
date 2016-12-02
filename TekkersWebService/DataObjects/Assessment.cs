@@ -13,6 +13,8 @@ namespace TekkersWebService.DataObjects
 
         public DateTime AssessmentDate { get; set; }
 
+        public int AssessmentScore { get; set; }
+
         public virtual ICollection<Test> Tests { get; set; }
 
         public virtual Player Player { get; set; }
