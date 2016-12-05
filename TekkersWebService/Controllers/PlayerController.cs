@@ -148,47 +148,54 @@ namespace TekkersWebService.Controllers
         }
 
         [HttpDelete]
-        [Route("tables/Player/{id}")]
-        // DELETE tables/Player/48D68C86-6EA6-4C25-AA33-223FC9A27959
+        [Route("tables/Player/DeletePlayer/{id}")]
+        // DELETE tables/Player/DeletePlayer/48D68C86-6EA6-4C25-AA33-223FC9A27959
+
         public async Task DeletePlayer(string id)
         {
             var conn = new TekkersContext();
             Player player = conn.Players.SingleOrDefault(p => p.Id == id);
+            //Team playersteam = new Team();
+            //Team playersteam = conn.Teams.Single(t => t.TeamPlayers.Contains(player));
 
-            //DELETE THE PLAYERS ASSESSMENTS AND TESTS
-            if (player.PlayerAssessments.Count > 0 || player.PlayerAssessments != null)
+            if (player != null)
             {
-                List<Assessment> assessments = new List<Assessment>();
-                assessments = conn.Assessments.Where(p => p.Player.Id == id).ToList();
-                foreach (var a in assessments)
+                //REMOVE THE PLAYER FROM THE TEAM
+                Team playersteam = player.PlayersTeam;
+                List<Player> theTeamsPlayers = playersteam.TeamPlayers.ToList();
+                theTeamsPlayers.Remove(player);
+                playersteam.TeamPlayers = theTeamsPlayers; 
+                await conn.SaveChangesAsync();
+
+                //DELETE THE PLAYERS ASSESSMENTS AND TESTS
+                if (player.PlayerAssessments.Count > 0 || player.PlayerAssessments != null)
                 {
-                    if (a.Tests.Count > 0)
+                    List<Assessment> assessments = new List<Assessment>();
+                    assessments = conn.Assessments.Where(p => p.Player.Id == id).ToList();
+                    foreach (var a in assessments)
                     {
-                        List<Test> tests = new List<Test>();
-                        tests = conn.Tests.Where(t => t.AssessmentTest.Id == a.Id).ToList();
-                        foreach (var t in tests)
+                        if (a.Tests.Count > 0)
                         {
-                            conn.Tests.Remove(t);
+                            List<Test> tests = new List<Test>();
+                            tests = conn.Tests.Where(t => t.AssessmentTest.Id == a.Id).ToList();
+                            foreach (var t in tests)
+                            {
+                                conn.Tests.Remove(t);
+                                await conn.SaveChangesAsync();
+                            }
+                            conn.Assessments.Remove(a);
                             await conn.SaveChangesAsync();
                         }
-                        conn.Assessments.Remove(a);
-                        await conn.SaveChangesAsync();
                     }
                 }
-            }
-            //REMOVE THE PLAYER FROM THE TEAM
-            var playersTeam = conn.Teams.Single(t => t.TeamPlayers.Contains(player));
-            if (playersTeam != null)
-            {
-                playersTeam.TeamPlayers.Remove(player);
-                await conn.SaveChangesAsync();
+                //DELETE THE PLAYER
+                await DeleteAsync(id);
+                return;
             }
             else
             {
                 return;
             }
-            await DeleteAsync(id);
-            return;
         }
 
         //GET tables/Player/GetPlayersOnTeamAsync/48D68C86-6EA6-4C25-AA33-223FC9A27959

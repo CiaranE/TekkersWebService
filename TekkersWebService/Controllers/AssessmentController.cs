@@ -61,9 +61,9 @@ namespace TekkersWebService.Controllers
             return DeleteAsync(id);
         }
 
-        //GET tables/Player/GetPlayersOnTeamAsync/48D68C86-6EA6-4C25-AA33-223FC9A27959
-        [Route("tables/Player/EnterAssessmentScore/{id}/{score}")]
-        public async Task EnterAssessmentScore(string id, int score)
+        //GET tables/Assessment/PostAssessmentScore/48D68C86-6EA6-4C25-AA33-223FC9A27959/12
+        [Route("tables/Assessment/PutAssessmentScore/{id}/{score}")]
+        public async Task PutAssessmentScore(string id, int score)
         {
             var conn = new TekkersContext();
             var assessment = conn.Assessments.Single(ass => ass.Id == id);

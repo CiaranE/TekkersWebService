@@ -53,7 +53,7 @@ namespace TekkersWebService.Controllers
         }
 
         // GET tables/Test/AssessmentID
-        [Route("GetTestsByAssessment/{assessid}")]
+        [Route("tables/Test/GetTestsByAssessment/{assessid}")]
         public ICollection<Test> GetTestsByAssessment(string assessid)
         {
             TekkersContext conn = new TekkersContext();
