@@ -7,6 +7,7 @@ using Microsoft.Azure.Mobile.Server;
 using TekkersWebService.Models;
 using TekkersWebService.DataObjects;
 using System;
+using System.Collections.Generic;
 
 namespace TekkersWebService.Controllers
 {
@@ -88,6 +89,23 @@ namespace TekkersWebService.Controllers
                 throw raise;
             }
             return;
+        }
+
+        //FROM HERE
+        //GET tables/Assessment/PostAssessmentScore/48D68C86-6EA6-4C25-AA33-223FC9A27959/12
+        [Route("tables/Assessment/GetMostRecentAssessmentsForTeam/{players}")]
+        public List<Assessment> GetMostRecentAssessmentsForTeam(List<Player> players)
+        {
+            var conn = new TekkersContext();
+            List<Assessment> assessments = new List<Assessment>();
+            foreach (var p in players)
+            {
+                var allPlayerAssessments = conn.Assessments.Where(a => a.Player.Id == p.Id);        //Get the assessments for each player
+                var dateOfMostRecentPlayerAssessment = allPlayerAssessments.Max(a => a.AssessmentDate); //Get date of most recent assessment
+                Assessment pa = allPlayerAssessments.Single(a => a.AssessmentDate >= dateOfMostRecentPlayerAssessment); //get the assessment with that date
+                assessments.Add(pa); 
+            }
+            return assessments;
         }
     }
 }
