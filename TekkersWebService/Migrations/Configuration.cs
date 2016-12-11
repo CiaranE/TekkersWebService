@@ -11,6 +11,7 @@ namespace TekkersService.Migrations
         {
             AutomaticMigrationsEnabled = true;
             ContextKey = "TekkersService.Models.TekkersContext";
+            //AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(TekkersWebService.Models.TekkersContext context)

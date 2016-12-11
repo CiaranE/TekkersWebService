@@ -91,20 +91,41 @@ namespace TekkersWebService.Controllers
             return;
         }
 
-        //FROM HERE
-        //GET tables/Assessment/PostAssessmentScore/48D68C86-6EA6-4C25-AA33-223FC9A27959/12
-        [Route("tables/Assessment/GetMostRecentAssessmentsForTeam/{players}")]
-        public List<Assessment> GetMostRecentAssessmentsForTeam(List<Player> players)
+        [Route("tables/Assessment/GetMostRecentAssessmentForPlayer/{id}")]
+        public Assessment GetMostRecentAssessmentForPlayer(string id)
         {
             var conn = new TekkersContext();
-            List<Assessment> assessments = new List<Assessment>();
-            foreach (var p in players)
+            var assessments = conn.Assessments.Where(a => a.Player.Id == id && a.Deleted == false);
+            if (assessments != null)
             {
-                var allPlayerAssessments = conn.Assessments.Where(a => a.Player.Id == p.Id);        //Get the assessments for each player
-                var dateOfMostRecentPlayerAssessment = allPlayerAssessments.Max(a => a.AssessmentDate); //Get date of most recent assessment
-                Assessment pa = allPlayerAssessments.Single(a => a.AssessmentDate >= dateOfMostRecentPlayerAssessment); //get the assessment with that date
-                assessments.Add(pa); 
+                var dateOfMostRecent = assessments.Max(a => a.AssessmentDate);
+                Assessment pa = assessments.FirstOrDefault(a => a.AssessmentDate >= dateOfMostRecent);
+                return pa;
             }
+            else
+            {
+                return null;
+            }
+        }
+
+        [Route("tables/Assessment/GetTopAssessmentsByAge/{agegroup}")]
+        public List<Assessment> GetTopAssessmentsByAge(int agegroup)
+        {
+            var conn = new TekkersContext();
+            var assessments = conn.Assessments.Where(a => a.Player.AgeGroup == agegroup && a.Deleted==false)
+                                              .OrderByDescending(x => x.AssessmentScore)
+                                              .Take(5)
+                                              .ToList();
+            return assessments;
+        }
+
+        [Route("tables/Assessment/GetAllAssessmentsForPlayer/{playerId}")]
+        public List<Assessment> GetAllAssessmentsForPlayer(string playerId)
+        {
+            var conn = new TekkersContext();
+            var assessments = conn.Assessments.Where(a => a.Player.Id == playerId && a.Deleted == false)
+                                              .OrderBy(x => x.AssessmentDate)
+                                              .ToList();
             return assessments;
         }
     }

@@ -207,5 +207,13 @@ namespace TekkersWebService.Controllers
             var playersOnTeam = team.TeamPlayers.ToList();
             return playersOnTeam;
         }
+
+        [Route("tables/Player/GetPlayerByParent/{name}")]
+        public List<Player> GetPlayerByParent(string name)
+        {
+            var conn = new TekkersContext();
+            var parents = conn.Players.Where(p => p.ParentFName == name).ToList();
+            return parents;
+        }
     }
 }

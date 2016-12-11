@@ -16,7 +16,5 @@ namespace TekkersService.DataObjects
 
         [JsonIgnore]
         public virtual ICollection<Player> TeamPlayers { get; set; }
-
-        public virtual ICollection<Assessment> TeamAssessments { get; set; }
     }
 }
