@@ -95,17 +95,21 @@ namespace TekkersWebService.Controllers
         public Assessment GetMostRecentAssessmentForPlayer(string id)
         {
             var conn = new TekkersContext();
-            var assessments = conn.Assessments.Where(a => a.Player.Id == id && a.Deleted == false);
-            if (assessments != null)
+            Assessment pa = new Assessment();
+            //var assessments = conn.Assessments.Any(a => a.Player.Id == id);
+            var assessment = conn.Assessments.Where(a => a.Player.Id == id && a.Deleted == false)
+                                              .OrderByDescending(x => x.AssessmentDate)
+                                              .Take(1)
+                                              .ToList();
+            if (assessment.Count == 1)
             {
-                var dateOfMostRecent = assessments.Max(a => a.AssessmentDate);
-                Assessment pa = assessments.FirstOrDefault(a => a.AssessmentDate >= dateOfMostRecent);
-                return pa;
+                pa = assessment[0];
             }
-            else
+            else if(assessment.Count == 0)
             {
-                return null;
+                pa = null;
             }
+            return pa;
         }
 
         [Route("tables/Assessment/GetTopAssessmentsByAge/{agegroup}")]
@@ -123,10 +127,19 @@ namespace TekkersWebService.Controllers
         public List<Assessment> GetAllAssessmentsForPlayer(string playerId)
         {
             var conn = new TekkersContext();
+            List<Assessment> theAssessments = new List<Assessment>();
             var assessments = conn.Assessments.Where(a => a.Player.Id == playerId && a.Deleted == false)
                                               .OrderBy(x => x.AssessmentDate)
                                               .ToList();
-            return assessments;
+            if (assessments.Count > 0)
+            {
+                theAssessments = assessments;
+            }
+            else if(assessments.Count == 0)
+            {
+                theAssessments = null;
+            }
+            return theAssessments;
         }
     }
 }
